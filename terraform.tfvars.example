@@ -1,0 +1,47 @@
+# =============================================================================
+# terraform.tfvars.example
+# Пример значений переменных. Скопируйте этот файл в terraform.tfvars
+# и замените плейсхолдеры на реальные значения.
+#
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# ВНИМАНИЕ: terraform.tfvars игнорируется git (см. .gitignore) и не должен
+# попадать в репозиторий, так как содержит секреты.
+# =============================================================================
+
+# --- Идентификаторы Yandex Cloud -------------------------------------------
+cloud_id  = "b1gxxxxxxxxxxxxxxxxxxxx"   # ID вашего облака
+folder_id = "b1gxxxxxxxxxxxxxxxxxxxx"   # ID вашего каталога
+zone      = "ru-central1-a"             # Зона доступности
+
+# --- Сеть (VPC) -------------------------------------------------------------
+network_name = "main-network"
+subnet_name  = "main-subnet"
+subnet_cidr  = ["10.0.0.0/24"]
+
+# --- Виртуальная машина -----------------------------------------------------
+vm_name      = "web-server"
+vm_cores     = 2
+vm_memory    = 2
+vm_disk_size = 20
+
+# ID образа Ubuntu 22.04 LTS (замените на актуальный для вашего каталога).
+# Получить список образов: yc compute image list --folder-id <folder_id>
+vm_image_id = "fd8xxxxxxxxxxxxxxxxxxxx"
+
+vm_username = "ubuntu"
+
+# Публичный SSH-ключ (например, содержимое файла ~/.ssh/id_rsa.pub).
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQ... user@host"
+
+# Откуда разрешён SSH-доступ (рекомендуется ограничить своим IP).
+ssh_allowed_cidr = ["0.0.0.0/0"]
+
+# Прерываемая ВМ (дешевле, но может быть остановлена облаком).
+preemptible = false
+
+# --- Метки ------------------------------------------------------------------
+labels = {
+  environment = "dev"
+  managed_by  = "terraform"
+}
