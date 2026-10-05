@@ -38,3 +38,12 @@ output "ssh_command" {
   description = "Команда для SSH-подключения к виртуальной машине"
   value       = "ssh ${var.vm_username}@${yandex_compute_instance.vm.network_interface[0].nat_ip_address}"
 }
+
+# Автоматическая генерация файла инвентаря для Ansible
+resource "local_file" "ansible_inventory" {
+  content = <<EOT
+[webservers]
+yandex-vm ansible_host=${yandex_compute_instance.vm.network_interface[0].nat_ip_address} ansible_user=${var.vm_username} ansible_ssh_private_key_file=~/.ssh/id_rsa
+EOT
+  filename = "${path.module}/ansible/hosts.ini"
+}

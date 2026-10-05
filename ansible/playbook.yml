@@ -1,0 +1,63 @@
+---
+- name: Развертывание Docker-стека на сервере в Yandex Cloud
+  hosts: webservers
+  become: yes  # Запуск команд через sudo
+  gather_facts: yes
+
+  tasks:
+    - name: Обновление кэша пакетов apt
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+
+    - name: Установка зависимостей для Docker
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - gnupg
+        state: present
+
+    - name: Добавление GPG-ключа Docker
+      apt_key:
+        url: https://docker.com
+        state: present
+
+    - name: Добавление репозитория Docker
+      apt_repository:
+        repo: "deb [arch=amd64] https://docker.com {{ ansible_distribution_release }} stable"
+        state: present
+
+    - name: Установка Docker Engine и Docker Compose
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+          - docker-compose-plugin
+        state: present
+
+    - name: Проверка, что служба Docker запущена
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Создание директории под проект
+      file:
+        path: /opt/monitoring-app
+        state: directory
+        mode: '0755'
+
+    - name: Копирование файла docker-compose.yml на сервер
+      copy:
+        src: docker-compose.yml
+        dest: /opt/monitoring-app/docker-compose.yml
+        mode: '0644'
+
+    - name: Запуск контейнеров через Docker Compose
+      command:
+        cmd: docker compose up -d
+        chdir: /opt/monitoring-app
